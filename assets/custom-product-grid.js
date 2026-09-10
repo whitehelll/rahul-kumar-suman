@@ -29,40 +29,48 @@
   /**
    * @param {Element} trigger
    */
-  async function getProductData(trigger) {
-    const handle = trigger.dataset.productHandle;
 
-    console.log("Product handle:", handle);
 
-    if (!handle) {
-      console.error("Product handle not found.");
-      return null;
-    }
+  function getProductData(trigger) {
+  const productId =
+    trigger.dataset.productId;
 
-    try {
-      const url = `${window.Shopify.routes.root}products/${handle}.js`;
+  const productDataElement =
+    document.querySelector(
+      `[data-product-data="${productId}"]`
+    );
 
-      console.log("Fetching product:", url);
+  if (!productDataElement) {
+    console.error(
+      'Product data not found for:',
+      productId
+    );
 
-      const response = await fetch(url);
-
-      console.log("Response status:", response.status);
-
-      if (!response.ok) {
-        throw new Error(`Unable to load product: ${handle}`);
-      }
-
-      const product = await response.json();
-
-      console.log("PRODUCT DATA:", product);
-
-      return product;
-    } catch (error) {
-      console.error("Unable to load product data:", error);
-
-      return null;
-    }
+    return null;
   }
+
+  try {
+    const product =
+      JSON.parse(
+        productDataElement.textContent
+      );
+
+    console.log(
+      'Loaded product:',
+      product
+    );
+
+    return product;
+  } catch (error) {
+    console.error(
+      'Invalid product JSON:',
+      error
+    );
+
+    return null;
+  }
+}
+
 
   /**
    * @param {{ options: any[]; }} product
