@@ -37,7 +37,11 @@
     {% render 'chat-drawer' %}
 
     <div class="page-wrapper">
-      
+      {% unless template.name == 'index' %}
+        <div id="header-group">
+          {% sections 'header-group' %}
+        </div>
+      {% endunless %}
 
       <script>
         /**
