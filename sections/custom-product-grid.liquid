@@ -1,1 +1,223 @@
-// we will build this part later in this project .
+<section class="custom-product-grid">
+  <div class="custom-product-grid__inner">
+
+    <h2 class="custom-product-grid__heading">
+      {{ section.settings.heading }}
+    </h2>
+
+    <div class="custom-product-grid__items">
+
+      {% for block in section.blocks %}
+        {% assign product = block.settings.product %}
+
+        {% if product != blank %}
+          <article
+            class="custom-product-card"
+            {{ block.shopify_attributes }}
+          >
+            <div class="custom-product-card__image-wrapper">
+
+              {% if product.featured_image %}
+                <img
+                  src="{{ product.featured_image | image_url: width: 900 }}"
+                  alt="{{ product.featured_image.alt | escape }}"
+                  width="{{ product.featured_image.width }}"
+                  height="{{ product.featured_image.height }}"
+                  loading="lazy"
+                  class="custom-product-card__image"
+                >
+              {% endif %}
+
+              <button
+                type="button"
+                class="custom-product-card__hotspot"
+                aria-label="View {{ product.title | escape }}"
+              >
+                +
+              </button>
+
+            </div>
+          </article>
+        {% endif %}
+
+      {% endfor %}
+
+    </div>
+  </div>
+</section>
+
+
+{% stylesheet %}
+
+.custom-product-grid {
+  width: 100%;
+  background: #ffffff;
+  padding: 70px 78px 100px;
+}
+
+.custom-product-grid__inner {
+  width: 100%;
+  max-width: 1284px;
+  margin: 0 auto;
+}
+
+.custom-product-grid__heading {
+  margin: 0 0 45px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 32px;
+  line-height: 1.1;
+  font-weight: 700;
+  text-transform: none;
+  color: #000000;
+}
+
+.custom-product-grid__items {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.custom-product-card {
+  position: relative;
+  min-width: 0;
+}
+
+.custom-product-card__image-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background: #f3f3f3;
+}
+
+.custom-product-card__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.custom-product-card__hotspot {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+
+  width: 36px;
+  height: 36px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+
+  background: #ffffff;
+  color: #000000;
+
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 25px;
+  font-weight: 400;
+  line-height: 1;
+
+  cursor: pointer;
+  z-index: 2;
+
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+
+  transition:
+    transform 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.custom-product-card__hotspot:hover {
+  transform: scale(1.08);
+  background: #000000;
+  color: #ffffff;
+}
+
+
+@media screen and (max-width: 749px) {
+
+  .custom-product-grid {
+    padding: 45px 20px 60px;
+  }
+
+  .custom-product-grid__heading {
+    margin-bottom: 25px;
+    font-size: 24px;
+  }
+
+  .custom-product-grid__items {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .custom-product-card__hotspot {
+    right: 10px;
+    bottom: 10px;
+    width: 30px;
+    height: 30px;
+    font-size: 21px;
+  }
+
+}
+
+{% endstylesheet %}
+
+
+{% schema %}
+{
+  "name": "Custom Product Grid",
+  "tag": "section",
+  "class": "custom-product-grid-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Tisso vison in the wild"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Product",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 6,
+  "presets": [
+    {
+      "name": "Custom Product Grid",
+      "blocks": [
+        {
+          "type": "product"
+        },
+        {
+          "type": "product"
+        },
+        {
+          "type": "product"
+        },
+        {
+          "type": "product"
+        },
+        {
+          "type": "product"
+        },
+        {
+          "type": "product"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
