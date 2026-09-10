@@ -133,6 +133,7 @@
       // @ts-ignore
       addButton.disabled = false;
     } else {
+      // @ts-ignore
       addButton.disabled = true;
     }
   }
