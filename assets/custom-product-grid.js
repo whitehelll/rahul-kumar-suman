@@ -275,7 +275,9 @@
   }
 
   /**
-     * @param {{options: any[];handle: string;} | null} product
+     * @param {{
+         price(price, currency): unknown;options: any[];handle: string;
+} | null} product
      */
   function openModal(product) {
     const modal =
