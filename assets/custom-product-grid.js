@@ -654,6 +654,7 @@
       // @ts-ignore
       modal.dataset.initialized !== 'true'
     ) {
+      // @ts-ignore
       modal.dataset.initialized = 'true';
 
       modal
