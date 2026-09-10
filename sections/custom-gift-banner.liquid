@@ -1,63 +1,440 @@
-<section class="custom-gift-banner">
-  <div class="custom-gift-banner__topbar">
-    <div class="custom-gift-banner__brand">
+<section class="gift-banner">
+
+  <!-- Top bar -->
+  <div class="gift-banner__topbar">
+
+    <div class="gift-banner__brand">
       {{ section.settings.brand_text }}
     </div>
 
-    <div class="custom-gift-banner__top-message">
+    <div class="gift-banner__top-message">
       {{ section.settings.top_message }}
     </div>
 
-    {% if section.settings.top_button_text != blank %}
-      <a
-        href="{{ section.settings.top_button_link }}"
-        class="custom-gift-banner__top-button"
-      >
-        {{ section.settings.top_button_text }}
-        <span aria-hidden="true">→</span>
-      </a>
-    {% endif %}
+    <a
+      href="{{ section.settings.top_button_link | default: '#' }}"
+      class="gift-banner__top-button"
+    >
+      <span>{{ section.settings.top_button_text }}</span>
+      <span aria-hidden="true">→</span>
+    </a>
+
   </div>
 
-  <div
-    class="custom-gift-banner__hero"
-    {% if section.settings.background_image != blank %}
-      style="background-image: url('{{ section.settings.background_image | image_url: width: 2400 }}');"
-    {% endif %}
-  >
-    <div class="custom-gift-banner__content">
-      <h1>{{ section.settings.heading }}</h1>
 
-      <div class="custom-gift-banner__description">
+  <!-- Main visual area -->
+  <div class="gift-banner__visual">
+
+    <!-- Top Figma artwork -->
+    <img
+      src="{{ 'bg-img.png' | asset_url }}"
+      alt=""
+      width="1440"
+      height="390"
+      class="gift-banner__desktop-art"
+    >
+
+    <!-- Bottom Figma artwork -->
+    <img
+      src="{{ 'img2.png' | asset_url }}"
+      alt=""
+      width="890"
+      height="402"
+      class="gift-banner__bottom-art"
+    >
+
+
+    <!-- Main content -->
+    <div class="gift-banner__content">
+
+      <h1 class="gift-banner__heading">
+        {{ section.settings.heading }}
+      </h1>
+
+      <div class="gift-banner__description">
         {{ section.settings.description }}
       </div>
 
-      {% if section.settings.button_text != blank %}
-        <a
-          href="{{ section.settings.button_link }}"
-          class="custom-gift-banner__button"
-        >
-          {{ section.settings.button_text }}
-          <span aria-hidden="true">→</span>
-        </a>
-      {% endif %}
+      <a
+        href="{{ section.settings.button_link | default: '#' }}"
+        class="gift-banner__button"
+      >
+        <span>{{ section.settings.button_text }}</span>
+        <span aria-hidden="true">→</span>
+      </a>
+
     </div>
+
   </div>
 
-  <div class="custom-gift-banner__bottom-message">
+
+  <!-- Bottom announcement -->
+  <div class="gift-banner__bottom">
     {{ section.settings.bottom_message }}
   </div>
+
 </section>
+
+
+{% stylesheet %}
+
+/* =========================================================
+   GIFT BANNER
+   ========================================================= */
+
+.gift-banner {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+
+  background: #ffffff;
+  color: #000000;
+
+  overflow: hidden;
+}
+
+
+/* =========================================================
+   TOP BAR
+   ========================================================= */
+
+.gift-banner__topbar {
+  height: 56px;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  align-items: center;
+
+  padding: 0 35px;
+
+  background: #f7f7f7;
+
+  font-size: 13px;
+  line-height: 1;
+}
+
+.gift-banner__brand {
+  justify-self: start;
+
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.gift-banner__top-message {
+  justify-self: center;
+
+  font-size: 12px;
+  font-weight: 400;
+
+  white-space: nowrap;
+}
+
+.gift-banner__top-button {
+  justify-self: end;
+
+  min-width: 139px;
+  height: 36px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 10px;
+
+  background: #fff200;
+  color: #000000;
+
+  text-decoration: none;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  transition:
+    transform 180ms ease,
+    background-color 180ms ease;
+}
+
+.gift-banner__top-button:hover {
+  transform: translateY(-1px);
+  background: #ffe600;
+}
+
+.gift-banner__top-button span:last-child {
+  transition: transform 180ms ease;
+}
+
+.gift-banner__top-button:hover span:last-child {
+  transform: translateX(5px);
+}
+
+
+/* =========================================================
+   VISUAL AREA
+   ========================================================= */
+
+.gift-banner__visual {
+  position: relative;
+
+  width: 100%;
+  height: 822px;
+
+  overflow: hidden;
+
+  background: #ffffff;
+}
+
+/* ============Top Image=======================*/
+
+.gift-banner__top-art{
+  position: absolute;
+
+  top:0;
+  left:50%;
+
+  width: 1440px;
+  height: 390px;
+
+  max-width: none;
+
+  transform: translateX(-50%);
+
+  display: block;
+
+  pointer-events: none;
+  user-select: none;
+}
+
+.gift-banner__bottom-art {
+  position: absolute;
+
+  top: 425px;
+  left: 750px;
+
+  width: 890px;
+  height: 402px;
+
+  max-width: none;
+
+  display: block;
+
+  pointer-events: none;
+  user-select: none;
+}
+
+
+
+
+/* =========================================================
+   CONTENT
+   ========================================================= */
+
+.gift-banner__content {
+  position: absolute;
+
+  left: 78px;
+  top: 550px;
+
+  z-index: 2;
+
+  width: 350px;
+}
+
+
+.gift-banner__heading {
+  margin: 0 0 27px;
+
+  font-size: 48px;
+  line-height: 1.05;
+
+  font-weight: 500;
+
+  letter-spacing: -0.025em;
+}
+
+
+/* Description */
+
+.gift-banner__description {
+  width: 330px;
+
+  margin: 0 0 32px;
+
+  font-size: 13px;
+  line-height: 1.55;
+
+  font-weight: 400;
+}
+
+.gift-banner__description p {
+  margin: 0;
+}
+
+
+/* =========================================================
+   SHOP NOW BUTTON
+   ========================================================= */
+
+.gift-banner__button {
+  position: relative;
+
+  width: 147px;
+  height: 47px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 14px;
+
+  background: #000000;
+  color: #ffffff;
+
+  text-decoration: none;
+
+  font-size: 10px;
+  font-weight: 500;
+
+  overflow: hidden;
+
+  transition:
+    transform 180ms ease,
+    background-color 180ms ease;
+}
+
+.gift-banner__button:hover {
+  transform: translateY(-2px);
+}
+
+.gift-banner__button span:last-child {
+  transition: transform 180ms ease;
+}
+
+.gift-banner__button:hover span:last-child {
+  transform: translateX(6px);
+}
+
+
+/* =========================================================
+   BOTTOM BAR
+   ========================================================= */
+
+.gift-banner__bottom {
+  position: relative;
+
+  z-index: 5;
+
+  height: 28px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #f7f7f7;
+
+  color: #000000;
+
+  font-size: 9px;
+  font-weight: 400;
+
+  text-align: center;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media screen and (max-width: 749px) {
+
+  .gift-banner__topbar {
+    height: 50px;
+
+    grid-template-columns: 1fr auto;
+
+    padding: 0 16px;
+  }
+
+  .gift-banner__brand {
+    font-size: 13px;
+  }
+
+  .gift-banner__top-message {
+    display: none;
+  }
+
+  .gift-banner__top-button {
+    min-width: auto;
+
+    height: 32px;
+
+    padding: 0 12px;
+
+    font-size: 9px;
+  }
+
+
+  /* Mobile visual */
+
+  .gift-banner__visual {
+    height: 650px;
+  }
+
+
+  /* Mobile content */
+
+  .gift-banner__content {
+    left: 24px;
+    top: 390px;
+
+    width: calc(100% - 48px);
+  }
+
+
+  .gift-banner__heading {
+    margin-bottom: 18px;
+
+    font-size: 42px;
+    line-height: 1;
+  }
+
+
+  .gift-banner__description {
+    width: 100%;
+    max-width: 330px;
+
+    margin-bottom: 25px;
+
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+
+  .gift-banner__button {
+    width: 145px;
+    height: 45px;
+  }
+
+
+  .gift-banner__bottom {
+    height: 32px;
+
+    padding: 0 10px;
+
+    font-size: 8px;
+  }
+
+}
+
+{% endstylesheet %}
+
 
 {% schema %}
 {
   "name": "Custom Gift Banner",
+  "tag": "section",
+  "class": "custom-gift-banner-section",
   "settings": [
-    {
-      "type": "image_picker",
-      "id": "background_image",
-      "label": "Background image"
-    },
     {
       "type": "text",
       "id": "brand_text",
@@ -84,7 +461,7 @@
     {
       "type": "text",
       "id": "heading",
-      "label": "Heading",
+      "label": "Main heading",
       "default": "The Gift Guide"
     },
     {
@@ -107,7 +484,7 @@
     {
       "type": "text",
       "id": "bottom_message",
-      "label": "Bottom message",
+      "label": "Bottom announcement",
       "default": "SUSTAINABLE, ETHICALLY MADE CLOTHES IN SIZES XXS TO 6XL"
     }
   ],
