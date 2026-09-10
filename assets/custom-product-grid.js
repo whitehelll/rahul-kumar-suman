@@ -600,19 +600,23 @@
     triggers.forEach((trigger) => {
       // @ts-ignore
       if (trigger.dataset.initialized === "true") {
-        return;
-      }
-
+        re
       // @ts-ignore
       trigger.dataset.initialized = "true";
 
-      trigger.addEventListener("click", () => {
-        const product = getProductData(trigger);
+      trigger.addEventListener(
+  'click',
+  () => {
+    const product =
+      getProductData(trigger);turn;
+      }
 
-        if (product) {
-          openModal(product);
-        }
-      });
+
+    if (product) {
+      openModal(product);
+    }
+  }
+);
     });
 
     const modal = document.querySelector("[data-product-modal]");
