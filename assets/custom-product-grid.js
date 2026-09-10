@@ -500,9 +500,11 @@
       return;
     }
 
+    // @ts-ignore
     addButton.disabled = true;
 
     if (errorElement) {
+      // @ts-ignore
       errorElement.hidden = true;
       errorElement.textContent = '';
     }
