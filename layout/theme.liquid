@@ -37,10 +37,14 @@
     {% render 'chat-drawer' %}
 
     <div class="page-wrapper">
-      <!=========condition for header to be hidden from main page>
-      <div id="header-group">
-        {% sections 'header-group' %}
-      </div>
+
+
+       <!=========condition for header to be hidden from main page>
+      {% unless template.name == 'index' %}
+        <div id="header-group">
+          {% sections 'header-group' %}
+        </div>
+      {% endunless %}
 
       <script>
         /**
@@ -159,11 +163,14 @@
       >
         {{ content_for_layout }}
       </main>
+      
 
       <!======  conditions for footer to not show on main page === >
-      <footer>
-  {% sections 'footer-group' %}
-</footer>
+      {% unless template.name == 'index' %}
+        <footer>
+          {% sections 'footer-group' %}
+        </footer>
+      {% endunless %}
     </div>
 
     {% render 'cart-drawer', render_wrapper: true %}
