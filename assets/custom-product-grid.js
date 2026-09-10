@@ -59,6 +59,10 @@
     }
   }
 
+  /**
+     * @param {{ options: any[]; }} product
+     * @param {string} optionName
+     */
   function getOptionIndex(product, optionName) {
     if (!product || !product.options) {
       return -1;
@@ -71,6 +75,9 @@
     );
   }
 
+  /**
+     * @param {{ options: any[]; handle: string; } | null} product
+     */
   function getVariant(product) {
     if (!product || !product.variants) {
       return null;
