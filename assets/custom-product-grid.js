@@ -627,6 +627,7 @@
         return;
       }
 
+      // @ts-ignore
       trigger.dataset.initialized = 'true';
 
       trigger.addEventListener(
@@ -650,6 +651,7 @@
     }
 
     if (
+      // @ts-ignore
       modal.dataset.initialized !== 'true'
     ) {
       modal.dataset.initialized = 'true';
