@@ -436,21 +436,17 @@
        * We therefore accept both "M" and "Medium".
        */
       const variant =
-        product.variants.find((/** @type {{ options: any[]; }} */ item) => {
-          const options =
-            item.options.map(
-              (value) =>
-                String(value).toLowerCase()
+        product.variants.find(function (/** @type {{ options: any[]; }} */ item) {
+            const options = item.options.map(
+                (value) => String(value).toLowerCase()
             );
 
-          const hasBlack =
-            options.includes('black');
+            const hasBlack = options.includes('black');
 
-          const hasMedium =
-            options.includes('m') ||
-            options.includes('medium');
+            const hasMedium = options.includes('m') ||
+                options.includes('medium');
 
-          return hasBlack && hasMedium;
+            return hasBlack && hasMedium;
         });
 
       return variant || null;
@@ -497,6 +493,7 @@
         errorElement.textContent =
           'Please select an available variant.';
 
+        // @ts-ignore
         errorElement.hidden = false;
       }
 
