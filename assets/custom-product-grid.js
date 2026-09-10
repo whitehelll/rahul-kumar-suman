@@ -192,6 +192,7 @@
         button.textContent = value;
 
         if (
+          // @ts-ignore
           selectedOptions[option.name] === value
         ) {
           button.classList.add('is-selected');
