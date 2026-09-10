@@ -1,0 +1,31 @@
+.custom-gift-banner {
+  min-height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  background: #f5f5f5;
+}
+
+.custom-gift-banner__content {
+  max-width: 700px;
+}
+
+.custom-gift-banner h1 {
+  margin: 0 0 20px;
+  font-size: 48px;
+}
+
+.custom-gift-banner p {
+  margin: 0 0 30px;
+  font-size: 18px;
+}
+
+.custom-gift-banner__button {
+  display: inline-block;
+  padding: 14px 28px;
+  background: #000;
+  color: #fff;
+  text-decoration: none;
+}
