@@ -275,7 +275,9 @@
   }
 
   /**
-     * @param {{ options: any[]; handle: string; } | null} product
+     * @param {{
+         price(price, currency): unknown; options: any[]; handle: string; 
+} | null} product
      */
   function openModal(product) {
     const modal =
@@ -299,6 +301,7 @@
     if (firstVariant) {
       product.options.forEach(
         (option, index) => {
+          // @ts-ignore
           selectedOptions[option.name] =
             firstVariant.options[index];
         }
@@ -335,6 +338,7 @@
         );
 
       const currency =
+        // @ts-ignore
         section?.dataset.currency || 'EUR';
 
       price.textContent =
