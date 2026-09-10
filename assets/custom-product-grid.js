@@ -526,6 +526,7 @@
        */
       if (
         requiresSoftWinterJacket() &&
+        // @ts-ignore
         currentProduct.handle !==
           'dark-winter-jacket'
       ) {
@@ -598,6 +599,7 @@
 
       if (errorElement) {
         errorElement.textContent =
+          // @ts-ignore
           error.message ||
           'Something went wrong. Please try again.';
 
