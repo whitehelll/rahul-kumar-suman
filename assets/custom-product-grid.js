@@ -29,25 +29,7 @@
   /**
    * @param {Element} trigger
    */
-  function getProductData(trigger) {
-    const productId = trigger.dataset.productId;
-
-    const productDataElement = document.querySelector(
-      `[data-product-data="${productId}"]`,
-    );
-
-    if (!productDataElement) {
-      return null;
-    }
-
-    try {
-      return JSON.parse(productDataElement.textContent);
-    } catch (error) {
-      console.error("Unable to read product data:", error);
-
-      return null;
-    }
-  }
+  
 
   /**
    * @param {{ options: any[]; }} product
