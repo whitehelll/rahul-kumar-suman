@@ -85,6 +85,7 @@
     }
 
     return (
+      // @ts-ignore
       product.variants.find((variant) => {
         if (!variant.available) {
           return false;
@@ -94,6 +95,7 @@
           (option, index) => {
             return (
               variant.options[index] ===
+              // @ts-ignore
               selectedOptions[option.name]
             );
           }
