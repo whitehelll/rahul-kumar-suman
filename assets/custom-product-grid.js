@@ -138,6 +138,10 @@
     }
   }
 
+  /**
+     * @param {{ name: string | null; values: any[]; }} option
+     * @param {number} index
+     */
   function renderOption(option, index) {
     const container =
       document.querySelector('[data-modal-options]');
@@ -167,6 +171,7 @@
      * Other options are displayed as select fields.
      */
     if (
+      // @ts-ignore
       option.name.toLowerCase().includes('color')
     ) {
       const buttonContainer =
