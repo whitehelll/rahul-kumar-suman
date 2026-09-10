@@ -276,7 +276,7 @@
 
   /**
      * @param {{
-         price(price, currency): unknown; options: any[]; handle: string; 
+         unknown; options: any[]; handle: string; 
 } | null} product
      */
   function openModal(product) {
