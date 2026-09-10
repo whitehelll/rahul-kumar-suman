@@ -257,23 +257,87 @@
     container.appendChild(optionWrapper);
   }
 
-  function renderOptions() {
-    const container =
-      document.querySelector('[data-modal-options]');
-
-    if (!container || !currentProduct) {
-      return;
-    }
-
-    container.innerHTML = '';
-
-    currentProduct.options.forEach(
-      (option, index) => {
-        renderOption(option, index);
-      }
-    );
+ function getProductOptions(product) {
+  if (!product) {
+    return [];
   }
 
+  if (
+    Array.isArray(product.options) &&
+    product.options.length > 0
+  ) {
+    return product.options;
+  }
+
+  /*
+   * Fallback:
+   * Build the option structure from variants
+   * if product.options is unavailable.
+   */
+  if (
+    Array.isArray(product.variants) &&
+    product.variants.length > 0
+  ) {
+    const optionCount =
+      product.variants[0].options
+        ? product.variants[0].options.length
+        : 0;
+
+    const options = [];
+
+    for (let index = 0; index < optionCount; index++) {
+      const values = [
+        ...new Set(
+          product.variants
+            .map(
+              (variant) =>
+                variant.options[index]
+            )
+            .filter(Boolean)
+        )
+      ];
+
+      let name = `Option ${index + 1}`;
+
+      if (index === 0) {
+        name = 'Size';
+      }
+
+      if (index === 1) {
+        name = 'Color';
+      }
+
+      options.push({
+        name,
+        values
+      });
+    }
+
+    return options;
+  }
+
+  return [];
+}
+
+function renderOptions() {
+  const container =
+    document.querySelector('[data-modal-options]');
+
+  if (!container || !currentProduct) {
+    return;
+  }
+
+  container.innerHTML = '';
+
+  const options =
+    getProductOptions(currentProduct);
+
+  options.forEach(
+    (option, index) => {
+      renderOption(option, index);
+    }
+  );
+}
   /**
      * @param {{
          price(price, currency): unknown;options: any[];handle: string;
