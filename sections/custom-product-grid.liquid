@@ -1,16 +1,65 @@
-<section class="custom-product-grid">
+<section class="custom-product-grid" id="CustomProductGrid-{{ section.id }}">
   <div class="custom-product-grid__inner">
+
     <h2 class="custom-product-grid__heading">
       {{ section.settings.heading }}
     </h2>
+
+    <div class="custom-product-grid__items">
+
+      {% for block in section.blocks %}
+        {% assign product = block.settings.product %}
+
+        {% if product %}
+          <article
+            class="custom-product-grid__item"
+            {{ block.shopify_attributes }}
+          >
+            <button
+              type="button"
+              class="custom-product-grid__product"
+              data-product-handle="{{ product.handle }}"
+              aria-label="View {{ product.title }}"
+            >
+
+              <div class="custom-product-grid__image-wrapper">
+
+                {% if product.featured_image %}
+                  {{
+                    product.featured_image
+                    | image_url: width: 1000
+                    | image_tag:
+                      loading: 'lazy',
+                      widths: '400, 600, 800, 1000',
+                      class: 'custom-product-grid__image',
+                      alt: product.featured_image.alt | default: product.title
+                  }}
+                {% endif %}
+
+                <span
+                  class="custom-product-grid__hotspot"
+                  aria-hidden="true"
+                >
+                  +
+                </span>
+
+              </div>
+
+            </button>
+          </article>
+        {% endif %}
+      {% endfor %}
+
+    </div>
   </div>
 </section>
+
 
 {% stylesheet %}
 
 .custom-product-grid {
   width: 100%;
-  padding: 60px 78px;
+  padding: 60px 78px 80px;
   background: #ffffff;
 }
 
@@ -20,20 +69,112 @@
 }
 
 .custom-product-grid__heading {
-  margin: 0;
+  margin: 0 0 32px;
   font-size: 32px;
   line-height: 1.1;
   font-weight: 700;
   color: #000000;
 }
 
+.custom-product-grid__items {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.custom-product-grid__item {
+  min-width: 0;
+}
+
+.custom-product-grid__product {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+}
+
+.custom-product-grid__image-wrapper {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.custom-product-grid__image {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+
+.custom-product-grid__hotspot {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 36px;
+  height: 36px;
+
+  border-radius: 50%;
+  background: #ffffff;
+  color: #000000;
+
+  font-size: 25px;
+  font-weight: 400;
+  line-height: 1;
+
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.15);
+
+  transition:
+    transform 180ms ease,
+    background-color 180ms ease;
+}
+
+.custom-product-grid__product:hover .custom-product-grid__hotspot {
+  transform: scale(1.08);
+}
+
+@media screen and (max-width: 749px) {
+
+  .custom-product-grid {
+    padding: 40px 16px 50px;
+  }
+
+  .custom-product-grid__heading {
+    margin-bottom: 24px;
+    font-size: 26px;
+  }
+
+  .custom-product-grid__items {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .custom-product-grid__hotspot {
+    right: 8px;
+    bottom: 8px;
+    width: 30px;
+    height: 30px;
+    font-size: 21px;
+  }
+}
+
 {% endstylesheet %}
+
+
 {% schema %}
 {
   "name": "Custom Product Grid",
   "tag": "section",
   "class": "custom-product-grid-section",
-
   "settings": [
     {
       "type": "text",
@@ -42,7 +183,6 @@
       "default": "Tisso vison in the wild"
     }
   ],
-
   "blocks": [
     {
       "type": "product",
@@ -56,9 +196,7 @@
       ]
     }
   ],
-
   "max_blocks": 6,
-
   "presets": [
     {
       "name": "Custom Product Grid",
