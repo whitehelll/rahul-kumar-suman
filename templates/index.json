@@ -1,10 +1,19 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "custom_gift_banner": {
       "type": "custom-gift-banner",
       "settings": {
         "heading": "The Gift Guide",
-        "description": "Find the ideal gift for your loved ones.",
+        "description": "",
         "button_text": "SHOP NOW",
         "button_link": "/collections/all"
       }
