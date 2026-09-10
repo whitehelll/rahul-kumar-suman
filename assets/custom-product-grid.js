@@ -242,7 +242,9 @@
       select.addEventListener(
         'change',
         (event) => {
+          // @ts-ignore
           selectedOptions[option.name] =
+            // @ts-ignore
             event.target.value;
 
           updateSelectedVariant();
@@ -272,6 +274,9 @@
     );
   }
 
+  /**
+     * @param {{ options: any[]; handle: string; } | null} product
+     */
   function openModal(product) {
     const modal =
       document.querySelector('[data-product-modal]');
