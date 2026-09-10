@@ -1,83 +1,72 @@
 (() => {
-  'use strict';
+  "use strict";
 
   /**
-     * @type {{ options: any[]; handle: string; } | null}
-     */
+   * @type {{ options: any[]; handle: string; } | null}
+   */
   let currentProduct = null;
   let selectedOptions = {};
   /**
-     * @type {{ options: any[]; id: any; } | null}
-     */
+   * @type {{ options: any[]; id: any; } | null}
+   */
   let selectedVariant = null;
 
   /**
-     * @param {any} cents
-     * @param {any} currency
-     */
+   * @param {any} cents
+   * @param {any} currency
+   */
   function formatMoney(cents, currency) {
     try {
-      return new Intl.NumberFormat(
-        document.documentElement.lang || 'en',
-        {
-          style: 'currency',
-          currency: currency || 'EUR'
-        }
-      ).format(Number(cents) / 100);
+      return new Intl.NumberFormat(document.documentElement.lang || "en", {
+        style: "currency",
+        currency: currency || "EUR",
+      }).format(Number(cents) / 100);
     } catch (error) {
       return `${Number(cents) / 100}`;
     }
   }
 
   /**
-     * @param {Element} trigger
-     */
+   * @param {Element} trigger
+   */
   function getProductData(trigger) {
     // @ts-ignore
     const productId = trigger.dataset.productId;
 
-    const productDataElement =
-      document.querySelector(
-        `[data-product-data="${productId}"]`
-      );
+    const productDataElement = document.querySelector(
+      `[data-product-data="${productId}"]`,
+    );
 
     if (!productDataElement) {
       return null;
     }
 
     try {
-      return JSON.parse(
-        productDataElement.textContent
-      );
+      return JSON.parse(productDataElement.textContent);
     } catch (error) {
-      console.error(
-        'Unable to read product data:',
-        error
-      );
+      console.error("Unable to read product data:", error);
 
       return null;
     }
   }
 
   /**
-     * @param {{ options: any[]; }} product
-     * @param {string} optionName
-     */
+   * @param {{ options: any[]; }} product
+   * @param {string} optionName
+   */
   function getOptionIndex(product, optionName) {
     if (!product || !product.options) {
       return -1;
     }
 
     return product.options.findIndex(
-      (option) =>
-        option.name.toLowerCase() ===
-        optionName.toLowerCase()
+      (option) => option.name.toLowerCase() === optionName.toLowerCase(),
     );
   }
 
   /**
-     * @param {{ options: any[]; handle: string; } | null} product
-     */
+   * @param {{ options: any[]; handle: string; } | null} product
+   */
   function getVariant(product) {
     // @ts-ignore
     if (!product || !product.variants) {
@@ -91,39 +80,35 @@
           return false;
         }
 
-        return product.options.every(
-          (option, index) => {
-            return (
-              variant.options[index] ===
-              // @ts-ignore
-              selectedOptions[option.name]
-            );
-          }
-        );
+        return product.options.every((option, index) => {
+          return (
+            variant.options[index] ===
+            // @ts-ignore
+            selectedOptions[option.name]
+          );
+        });
       }) || null
     );
   }
 
   /**
-     * @param {{ variants: any[]; }} product
-     */
+   * @param {{ variants: any[]; }} product
+   */
   function getFirstAvailableVariant(product) {
     if (!product || !product.variants) {
       return null;
     }
 
     return (
-      product.variants.find(
-        (variant) => variant.available
-      ) || product.variants[0]
+      product.variants.find((variant) => variant.available) ||
+      product.variants[0]
     );
   }
 
   function updateSelectedVariant() {
     selectedVariant = getVariant(currentProduct);
 
-    const addButton =
-      document.querySelector('[data-add-to-cart]');
+    const addButton = document.querySelector("[data-add-to-cart]");
 
     if (!addButton) {
       return;
@@ -139,28 +124,23 @@
   }
 
   /**
-     * @param {{ name: string | null; values: any[]; }} option
-     * @param {number} index
-     */
+   * @param {{ name: string | null; values: any[]; }} option
+   * @param {number} index
+   */
   function renderOption(option, index) {
-    const container =
-      document.querySelector('[data-modal-options]');
+    const container = document.querySelector("[data-modal-options]");
 
     if (!container) {
       return;
     }
 
-    const optionWrapper =
-      document.createElement('div');
+    const optionWrapper = document.createElement("div");
 
-    optionWrapper.className =
-      'gift-product-modal__option';
+    optionWrapper.className = "gift-product-modal__option";
 
-    const label =
-      document.createElement('label');
+    const label = document.createElement("label");
 
-    label.className =
-      'gift-product-modal__option-label';
+    label.className = "gift-product-modal__option-label";
 
     label.textContent = option.name;
 
@@ -172,22 +152,18 @@
      */
     if (
       // @ts-ignore
-      option.name.toLowerCase().includes('color')
+      option.name.toLowerCase().includes("color")
     ) {
-      const buttonContainer =
-        document.createElement('div');
+      const buttonContainer = document.createElement("div");
 
-      buttonContainer.className =
-        'gift-product-modal__option-buttons';
+      buttonContainer.className = "gift-product-modal__option-buttons";
 
       option.values.forEach((value) => {
-        const button =
-          document.createElement('button');
+        const button = document.createElement("button");
 
-        button.type = 'button';
+        button.type = "button";
 
-        button.className =
-          'gift-product-modal__option-button';
+        button.className = "gift-product-modal__option-button";
 
         button.textContent = value;
 
@@ -195,36 +171,28 @@
           // @ts-ignore
           selectedOptions[option.name] === value
         ) {
-          button.classList.add('is-selected');
+          button.classList.add("is-selected");
         }
 
-        button.addEventListener(
-          'click',
-          () => {
-            // @ts-ignore
-            selectedOptions[option.name] = value;
+        button.addEventListener("click", () => {
+          // @ts-ignore
+          selectedOptions[option.name] = value;
 
-            renderOptions();
-            updateSelectedVariant();
-          }
-        );
+          renderOptions();
+          updateSelectedVariant();
+        });
 
         buttonContainer.appendChild(button);
       });
 
-      optionWrapper.appendChild(
-        buttonContainer
-      );
+      optionWrapper.appendChild(buttonContainer);
     } else {
-      const select =
-        document.createElement('select');
+      const select = document.createElement("select");
 
-      select.className =
-        'gift-product-modal__select';
+      select.className = "gift-product-modal__select";
 
       option.values.forEach((value) => {
-        const optionElement =
-          document.createElement('option');
+        const optionElement = document.createElement("option");
 
         optionElement.value = value;
         optionElement.textContent = value;
@@ -239,17 +207,14 @@
         select.appendChild(optionElement);
       });
 
-      select.addEventListener(
-        'change',
-        (event) => {
+      select.addEventListener("change", (event) => {
+        // @ts-ignore
+        selectedOptions[option.name] =
           // @ts-ignore
-          selectedOptions[option.name] =
-            // @ts-ignore
-            event.target.value;
+          event.target.value;
 
-          updateSelectedVariant();
-        }
-      );
+        updateSelectedVariant();
+      });
 
       optionWrapper.appendChild(select);
     }
@@ -257,95 +222,80 @@
     container.appendChild(optionWrapper);
   }
 
- function getProductOptions(product) {
-  if (!product) {
-    return [];
-  }
+  function getProductOptions(product) {
+    if (!product) {
+      return [];
+    }
 
-  if (
-    Array.isArray(product.options) &&
-    product.options.length > 0
-  ) {
-    return product.options;
-  }
+    if (Array.isArray(product.options) && product.options.length > 0) {
+      return product.options;
+    }
 
-  /*
-   * Fallback:
-   * Build the option structure from variants
-   * if product.options is unavailable.
-   */
-  if (
-    Array.isArray(product.variants) &&
-    product.variants.length > 0
-  ) {
-    const optionCount =
-      product.variants[0].options
+    /*
+     * Fallback:
+     * Build the option structure from variants
+     * if product.options is unavailable.
+     */
+    if (Array.isArray(product.variants) && product.variants.length > 0) {
+      const optionCount = product.variants[0].options
         ? product.variants[0].options.length
         : 0;
 
-    const options = [];
+      const options = [];
 
-    for (let index = 0; index < optionCount; index++) {
-      const values = [
-        ...new Set(
-          product.variants
-            .map(
-              (variant) =>
-                variant.options[index]
-            )
-            .filter(Boolean)
-        )
-      ];
+      for (let index = 0; index < optionCount; index++) {
+        const values = [
+          ...new Set(
+            product.variants
+              .map((variant) => variant.options[index])
+              .filter(Boolean),
+          ),
+        ];
 
-      let name = `Option ${index + 1}`;
+        let name = `Option ${index + 1}`;
 
-      if (index === 0) {
-        name = 'Size';
+        if (index === 0) {
+          name = "Size";
+        }
+
+        if (index === 1) {
+          name = "Color";
+        }
+
+        options.push({
+          name,
+          values,
+        });
       }
 
-      if (index === 1) {
-        name = 'Color';
-      }
-
-      options.push({
-        name,
-        values
-      });
+      return options;
     }
 
-    return options;
+    return [];
   }
 
-  return [];
-}
+  function renderOptions() {
+    const container = document.querySelector("[data-modal-options]");
 
-function renderOptions() {
-  const container =
-    document.querySelector('[data-modal-options]');
+    if (!container || !currentProduct) {
+      return;
+    }
 
-  if (!container || !currentProduct) {
-    return;
-  }
+    container.innerHTML = "";
 
-  container.innerHTML = '';
+    const options = getProductOptions(currentProduct);
 
-  const options =
-    getProductOptions(currentProduct);
-
-  options.forEach(
-    (option, index) => {
+    options.forEach((option, index) => {
       renderOption(option, index);
-    }
-  );
-}
+    });
+  }
   /**
      * @param {{
          price(price, currency): unknown;options: any[];handle: string;
 } | null} product
      */
   function openModal(product) {
-    const modal =
-      document.querySelector('[data-product-modal]');
+    const modal = document.querySelector("[data-product-modal]");
 
     if (!modal || !product) {
       return;
@@ -363,33 +313,24 @@ function renderOptions() {
       getFirstAvailableVariant(product);
 
     if (firstVariant) {
-      product.options.forEach(
-        (option, index) => {
-          // @ts-ignore
-          selectedOptions[option.name] =
-            firstVariant.options[index];
-        }
-      );
+      const options = getProductOptions(product);
+
+      options.forEach((option, index) => {
+        selectedOptions[option.name] = firstVariant.options[index];
+      });
     }
 
     selectedVariant = firstVariant;
 
-    const title =
-      modal.querySelector('[data-modal-title]');
+    const title = modal.querySelector("[data-modal-title]");
 
-    const price =
-      modal.querySelector('[data-modal-price]');
+    const price = modal.querySelector("[data-modal-price]");
 
-    const description =
-      modal.querySelector(
-        '[data-modal-description]'
-      );
+    const description = modal.querySelector("[data-modal-description]");
 
-    const image =
-      modal.querySelector('[data-modal-image]');
+    const image = modal.querySelector("[data-modal-image]");
 
-    const error =
-      modal.querySelector('[data-modal-error]');
+    const error = modal.querySelector("[data-modal-error]");
 
     if (title) {
       // @ts-ignore
@@ -397,39 +338,30 @@ function renderOptions() {
     }
 
     if (price) {
-      const section =
-        document.querySelector(
-          '.custom-product-grid-section'
-        );
+      const section = document.querySelector(".custom-product-grid-section");
 
       const currency =
         // @ts-ignore
-        section?.dataset.currency || 'EUR';
+        section?.dataset.currency || "EUR";
 
-      price.textContent =
-        formatMoney(
-          product.price,
-          currency
-        );
+      price.textContent = formatMoney(product.price, currency);
     }
 
     if (description) {
       description.innerHTML =
         // @ts-ignore
-        product.description || '';
+        product.description || "";
     }
 
     if (image) {
-      const trigger =
-        document.querySelector(
-          // @ts-ignore
-          `[data-product-id="${product.id}"]`
-        );
+      const trigger = document.querySelector(
+        // @ts-ignore
+        `[data-product-id="${product.id}"]`,
+      );
 
-      const productImage =
-        trigger?.querySelector(
-          '.custom-product-grid__image'
-        );
+      const productImage = trigger?.querySelector(
+        ".custom-product-grid__image",
+      );
 
       if (productImage) {
         // @ts-ignore
@@ -442,54 +374,43 @@ function renderOptions() {
     if (error) {
       // @ts-ignore
       error.hidden = true;
-      error.textContent = '';
+      error.textContent = "";
     }
 
     renderOptions();
     updateSelectedVariant();
 
-    modal.classList.add('is-open');
-    modal.setAttribute(
-      'aria-hidden',
-      'false'
-    );
+    modal.classList.add("is-open");
+    modal.setAttribute("aria-hidden", "false");
 
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow = "hidden";
   }
 
   function closeModal() {
-    const modal =
-      document.querySelector('[data-product-modal]');
+    const modal = document.querySelector("[data-product-modal]");
 
     if (!modal) {
       return;
     }
 
-    modal.classList.remove('is-open');
+    modal.classList.remove("is-open");
 
-    modal.setAttribute(
-      'aria-hidden',
-      'true'
-    );
+    modal.setAttribute("aria-hidden", "true");
 
-    document.body.style.overflow = '';
+    document.body.style.overflow = "";
   }
 
   async function getSoftWinterJacketVariant() {
     try {
-      const response =
-        await fetch(
-          `${window.Shopify.routes.root}products/dark-winter-jacket.js`
-        );
+      const response = await fetch(
+        `${window.Shopify.routes.root}products/dark-winter-jacket.js`,
+      );
 
       if (!response.ok) {
-        throw new Error(
-          'Unable to load Soft Winter Jacket'
-        );
+        throw new Error("Unable to load Soft Winter Jacket");
       }
 
-      const product =
-        await response.json();
+      const product = await response.json();
 
       /*
        * Find the Black + Medium variant.
@@ -500,26 +421,23 @@ function renderOptions() {
        *
        * We therefore accept both "M" and "Medium".
        */
-      const variant =
-        product.variants.find(function (/** @type {{ options: any[]; }} */ item) {
-            const options = item.options.map(
-                (value) => String(value).toLowerCase()
-            );
+      const variant = product.variants.find(
+        function (/** @type {{ options: any[]; }} */ item) {
+          const options = item.options.map((value) =>
+            String(value).toLowerCase(),
+          );
 
-            const hasBlack = options.includes('black');
+          const hasBlack = options.includes("black");
 
-            const hasMedium = options.includes('m') ||
-                options.includes('medium');
+          const hasMedium = options.includes("m") || options.includes("medium");
 
-            return hasBlack && hasMedium;
-        });
+          return hasBlack && hasMedium;
+        },
+      );
 
       return variant || null;
     } catch (error) {
-      console.error(
-        'Soft Winter Jacket error:',
-        error
-      );
+      console.error("Soft Winter Jacket error:", error);
 
       return null;
     }
@@ -530,33 +448,25 @@ function renderOptions() {
       return false;
     }
 
-    const options =
-      selectedVariant.options.map(
-        (value) =>
-          String(value).toLowerCase()
-      );
+    const options = selectedVariant.options.map((value) =>
+      String(value).toLowerCase(),
+    );
 
-    const hasBlack =
-      options.includes('black');
+    const hasBlack = options.includes("black");
 
-    const hasMedium =
-      options.includes('m') ||
-      options.includes('medium');
+    const hasMedium = options.includes("m") || options.includes("medium");
 
     return hasBlack && hasMedium;
   }
 
   async function addToCart() {
-    const addButton =
-      document.querySelector('[data-add-to-cart]');
+    const addButton = document.querySelector("[data-add-to-cart]");
 
-    const errorElement =
-      document.querySelector('[data-modal-error]');
+    const errorElement = document.querySelector("[data-modal-error]");
 
     if (!selectedVariant) {
       if (errorElement) {
-        errorElement.textContent =
-          'Please select an available variant.';
+        errorElement.textContent = "Please select an available variant.";
 
         // @ts-ignore
         errorElement.hidden = false;
@@ -571,15 +481,15 @@ function renderOptions() {
     if (errorElement) {
       // @ts-ignore
       errorElement.hidden = true;
-      errorElement.textContent = '';
+      errorElement.textContent = "";
     }
 
     try {
       const items = [
         {
           id: selectedVariant.id,
-          quantity: 1
-        }
+          quantity: 1,
+        },
       ];
 
       /*
@@ -592,47 +502,35 @@ function renderOptions() {
       if (
         requiresSoftWinterJacket() &&
         // @ts-ignore
-        currentProduct.handle !==
-          'dark-winter-jacket'
+        currentProduct.handle !== "dark-winter-jacket"
       ) {
-        const jacketVariant =
-          await getSoftWinterJacketVariant();
+        const jacketVariant = await getSoftWinterJacketVariant();
 
         if (jacketVariant) {
           items.push({
             id: jacketVariant.id,
-            quantity: 1
+            quantity: 1,
           });
         }
       }
 
-      const response =
-        await fetch(
-          `${window.Shopify.routes.root}cart/add.js`,
-          {
-            method: 'POST',
+      const response = await fetch(`${window.Shopify.routes.root}cart/add.js`, {
+        method: "POST",
 
-            headers: {
-              'Content-Type':
-                'application/json',
-              Accept:
-                'application/json'
-            },
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
 
-            body: JSON.stringify({
-              items
-            })
-          }
-        );
+        body: JSON.stringify({
+          items,
+        }),
+      });
 
-      const data =
-        await response.json();
+      const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(
-          data.description ||
-            'Unable to add product to cart.'
-        );
+        throw new Error(data.description || "Unable to add product to cart.");
       }
 
       /*
@@ -644,29 +542,22 @@ function renderOptions() {
        * Refresh the cart drawer/cart count.
        */
       document.dispatchEvent(
-        new CustomEvent(
-          'cart:updated',
-          {
-            detail: data
-          }
-        )
+        new CustomEvent("cart:updated", {
+          detail: data,
+        }),
       );
 
       /*
        * Give the customer a visible confirmation.
        */
-      alert('Product added to cart.');
+      alert("Product added to cart.");
     } catch (error) {
-      console.error(
-        'Add to cart error:',
-        error
-      );
+      console.error("Add to cart error:", error);
 
       if (errorElement) {
         errorElement.textContent =
           // @ts-ignore
-          error.message ||
-          'Something went wrong. Please try again.';
+          error.message || "Something went wrong. Please try again.";
 
         // @ts-ignore
         errorElement.hidden = false;
@@ -678,38 +569,30 @@ function renderOptions() {
   }
 
   function initProductGrid() {
-    const triggers =
-      document.querySelectorAll(
-        '[data-product-trigger]'
-      );
+    const triggers = document.querySelectorAll("[data-product-trigger]");
 
     /*
      * Avoid attaching duplicate listeners.
      */
     triggers.forEach((trigger) => {
       // @ts-ignore
-      if (trigger.dataset.initialized === 'true') {
+      if (trigger.dataset.initialized === "true") {
         return;
       }
 
       // @ts-ignore
-      trigger.dataset.initialized = 'true';
+      trigger.dataset.initialized = "true";
 
-      trigger.addEventListener(
-        'click',
-        () => {
-          const product =
-            getProductData(trigger);
+      trigger.addEventListener("click", () => {
+        const product = getProductData(trigger);
 
-          if (product) {
-            openModal(product);
-          }
+        if (product) {
+          openModal(product);
         }
-      );
+      });
     });
 
-    const modal =
-      document.querySelector('[data-product-modal]');
+    const modal = document.querySelector("[data-product-modal]");
 
     if (!modal) {
       return;
@@ -717,30 +600,19 @@ function renderOptions() {
 
     if (
       // @ts-ignore
-      modal.dataset.initialized !== 'true'
+      modal.dataset.initialized !== "true"
     ) {
       // @ts-ignore
-      modal.dataset.initialized = 'true';
+      modal.dataset.initialized = "true";
 
-      modal
-        .querySelectorAll('[data-modal-close]')
-        .forEach((element) => {
-          element.addEventListener(
-            'click',
-            closeModal
-          );
-        });
+      modal.querySelectorAll("[data-modal-close]").forEach((element) => {
+        element.addEventListener("click", closeModal);
+      });
 
-      const addButton =
-        modal.querySelector(
-          '[data-add-to-cart]'
-        );
+      const addButton = modal.querySelector("[data-add-to-cart]");
 
       if (addButton) {
-        addButton.addEventListener(
-          'click',
-          addToCart
-        );
+        addButton.addEventListener("click", addToCart);
       }
     }
   }
@@ -748,13 +620,8 @@ function renderOptions() {
   /*
    * Normal page load.
    */
-  if (
-    document.readyState === 'loading'
-  ) {
-    document.addEventListener(
-      'DOMContentLoaded',
-      initProductGrid
-    );
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initProductGrid);
   } else {
     initProductGrid();
   }
@@ -764,20 +631,14 @@ function renderOptions() {
    * sections, so initialise again when a
    * section is loaded.
    */
-  document.addEventListener(
-    'shopify:section:load',
-    initProductGrid
-  );
+  document.addEventListener("shopify:section:load", initProductGrid);
 
   /*
    * ESC closes the popup.
    */
-  document.addEventListener(
-    'keydown',
-    (event) => {
-      if (event.key === 'Escape') {
-        closeModal();
-      }
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      closeModal();
     }
-  );
+  });
 })();
