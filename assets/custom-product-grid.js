@@ -1,8 +1,14 @@
 (() => {
   'use strict';
 
+  /**
+     * @type {{ options: any[]; handle: string; } | null}
+     */
   let currentProduct = null;
   let selectedOptions = {};
+  /**
+     * @type {{ options: any[]; id: any; } | null}
+     */
   let selectedVariant = null;
 
   function formatMoney(cents, currency) {
