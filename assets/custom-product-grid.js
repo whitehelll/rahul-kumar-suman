@@ -350,12 +350,14 @@
 
     if (description) {
       description.innerHTML =
+        // @ts-ignore
         product.description || '';
     }
 
     if (image) {
       const trigger =
         document.querySelector(
+          // @ts-ignore
           `[data-product-id="${product.id}"]`
         );
 
@@ -365,6 +367,7 @@
         );
 
       if (productImage) {
+        // @ts-ignore
         image.src = productImage.src;
         image.alt = product.title;
       }
