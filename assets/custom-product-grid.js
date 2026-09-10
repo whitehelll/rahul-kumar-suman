@@ -30,7 +30,6 @@
    * @param {Element} trigger
    */
   function getProductData(trigger) {
-    // @ts-ignore
     const productId = trigger.dataset.productId;
 
     const productDataElement = document.querySelector(
