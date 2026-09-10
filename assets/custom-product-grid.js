@@ -340,13 +340,14 @@
     if (price) {
       const section = document.querySelector(".custom-product-grid-section");
 
-      const currency =
-        // @ts-ignore
-        section?.dataset.currency || "EUR";
+      const currency = section?.dataset.currency || "EUR";
 
-      price.textContent = formatMoney(product.price, currency);
+      const variant = getFirstAvailableVariant(product);
+
+      const priceValue = variant?.price ?? product.price;
+
+      price.textContent = formatMoney(priceValue, currency);
     }
-
     if (description) {
       description.innerHTML =
         // @ts-ignore
