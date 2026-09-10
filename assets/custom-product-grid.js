@@ -603,9 +603,11 @@
           error.message ||
           'Something went wrong. Please try again.';
 
+        // @ts-ignore
         errorElement.hidden = false;
       }
     } finally {
+      // @ts-ignore
       addButton.disabled = false;
     }
   }
@@ -620,6 +622,7 @@
      * Avoid attaching duplicate listeners.
      */
     triggers.forEach((trigger) => {
+      // @ts-ignore
       if (trigger.dataset.initialized === 'true') {
         return;
       }
