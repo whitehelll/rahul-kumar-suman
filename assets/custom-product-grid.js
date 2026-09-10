@@ -436,7 +436,7 @@
        * We therefore accept both "M" and "Medium".
        */
       const variant =
-        product.variants.find((item) => {
+        product.variants.find((/** @type {{ options: any[]; }} */ item) => {
           const options =
             item.options.map(
               (value) =>

@@ -2,6 +2,7 @@ export {};
 
 declare global {
   interface Shopify {
+    routes: any;
     country: string;
     currency: {
       active: string;
