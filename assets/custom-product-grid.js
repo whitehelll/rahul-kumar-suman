@@ -1,359 +1,659 @@
 (() => {
+  'use strict';
+
+  let currentProduct = null;
+  let selectedOptions = {};
+  let selectedVariant = null;
+
   function formatMoney(cents, currency) {
-    return new Intl.NumberFormat(document.documentElement.lang || 'en', {
-      style: 'currency',
-      currency: currency || 'EUR'
-    }).format(Number(cents) / 100);
+    try {
+      return new Intl.NumberFormat(
+        document.documentElement.lang || 'en',
+        {
+          style: 'currency',
+          currency: currency || 'EUR'
+        }
+      ).format(Number(cents) / 100);
+    } catch (error) {
+      return `${Number(cents) / 100}`;
+    }
   }
 
   function getProductData(trigger) {
     const productId = trigger.dataset.productId;
 
-    const section = trigger.closest('.custom-product-grid-section');
+    const productDataElement =
+      document.querySelector(
+        `[data-product-data="${productId}"]`
+      );
 
-    if (!section) {
-      return null;
-    }
-
-    const productScript = section.querySelector(
-      `[data-product-data="${productId}"]`
-    );
-
-    if (!productScript) {
-      console.error('Product data not found:', productId);
+    if (!productDataElement) {
       return null;
     }
 
     try {
-      return JSON.parse(productScript.textContent);
+      return JSON.parse(
+        productDataElement.textContent
+      );
     } catch (error) {
-      console.error('Could not parse product data:', error);
+      console.error(
+        'Unable to read product data:',
+        error
+      );
+
       return null;
     }
   }
 
-  function initProductGrid(section) {
-    if (!section || section.dataset.productGridInitialized === 'true') {
+  function getOptionIndex(product, optionName) {
+    if (!product || !product.options) {
+      return -1;
+    }
+
+    return product.options.findIndex(
+      (option) =>
+        option.name.toLowerCase() ===
+        optionName.toLowerCase()
+    );
+  }
+
+  function getVariant(product) {
+    if (!product || !product.variants) {
+      return null;
+    }
+
+    return (
+      product.variants.find((variant) => {
+        if (!variant.available) {
+          return false;
+        }
+
+        return product.options.every(
+          (option, index) => {
+            return (
+              variant.options[index] ===
+              selectedOptions[option.name]
+            );
+          }
+        );
+      }) || null
+    );
+  }
+
+  function getFirstAvailableVariant(product) {
+    if (!product || !product.variants) {
+      return null;
+    }
+
+    return (
+      product.variants.find(
+        (variant) => variant.available
+      ) || product.variants[0]
+    );
+  }
+
+  function updateSelectedVariant() {
+    selectedVariant = getVariant(currentProduct);
+
+    const addButton =
+      document.querySelector('[data-add-to-cart]');
+
+    if (!addButton) {
       return;
     }
 
-    section.dataset.productGridInitialized = 'true';
+    if (selectedVariant) {
+      addButton.disabled = false;
+    } else {
+      addButton.disabled = true;
+    }
+  }
 
-    const modal = section.querySelector('[data-product-modal]');
+  function renderOption(option, index) {
+    const container =
+      document.querySelector('[data-modal-options]');
+
+    if (!container) {
+      return;
+    }
+
+    const optionWrapper =
+      document.createElement('div');
+
+    optionWrapper.className =
+      'gift-product-modal__option';
+
+    const label =
+      document.createElement('label');
+
+    label.className =
+      'gift-product-modal__option-label';
+
+    label.textContent = option.name;
+
+    optionWrapper.appendChild(label);
+
+    /*
+     * Color options are displayed as buttons.
+     * Other options are displayed as select fields.
+     */
+    if (
+      option.name.toLowerCase().includes('color')
+    ) {
+      const buttonContainer =
+        document.createElement('div');
+
+      buttonContainer.className =
+        'gift-product-modal__option-buttons';
+
+      option.values.forEach((value) => {
+        const button =
+          document.createElement('button');
+
+        button.type = 'button';
+
+        button.className =
+          'gift-product-modal__option-button';
+
+        button.textContent = value;
+
+        if (
+          selectedOptions[option.name] === value
+        ) {
+          button.classList.add('is-selected');
+        }
+
+        button.addEventListener(
+          'click',
+          () => {
+            selectedOptions[option.name] = value;
+
+            renderOptions();
+            updateSelectedVariant();
+          }
+        );
+
+        buttonContainer.appendChild(button);
+      });
+
+      optionWrapper.appendChild(
+        buttonContainer
+      );
+    } else {
+      const select =
+        document.createElement('select');
+
+      select.className =
+        'gift-product-modal__select';
+
+      option.values.forEach((value) => {
+        const optionElement =
+          document.createElement('option');
+
+        optionElement.value = value;
+        optionElement.textContent = value;
+
+        if (
+          selectedOptions[option.name] === value
+        ) {
+          optionElement.selected = true;
+        }
+
+        select.appendChild(optionElement);
+      });
+
+      select.addEventListener(
+        'change',
+        (event) => {
+          selectedOptions[option.name] =
+            event.target.value;
+
+          updateSelectedVariant();
+        }
+      );
+
+      optionWrapper.appendChild(select);
+    }
+
+    container.appendChild(optionWrapper);
+  }
+
+  function renderOptions() {
+    const container =
+      document.querySelector('[data-modal-options]');
+
+    if (!container || !currentProduct) {
+      return;
+    }
+
+    container.innerHTML = '';
+
+    currentProduct.options.forEach(
+      (option, index) => {
+        renderOption(option, index);
+      }
+    );
+  }
+
+  function openModal(product) {
+    const modal =
+      document.querySelector('[data-product-modal]');
+
+    if (!modal || !product) {
+      return;
+    }
+
+    currentProduct = product;
+
+    selectedOptions = {};
+
+    /*
+     * Start with the first available variant.
+     */
+    const firstVariant =
+      getFirstAvailableVariant(product);
+
+    if (firstVariant) {
+      product.options.forEach(
+        (option, index) => {
+          selectedOptions[option.name] =
+            firstVariant.options[index];
+        }
+      );
+    }
+
+    selectedVariant = firstVariant;
+
+    const title =
+      modal.querySelector('[data-modal-title]');
+
+    const price =
+      modal.querySelector('[data-modal-price]');
+
+    const description =
+      modal.querySelector(
+        '[data-modal-description]'
+      );
+
+    const image =
+      modal.querySelector('[data-modal-image]');
+
+    const error =
+      modal.querySelector('[data-modal-error]');
+
+    if (title) {
+      title.textContent = product.title;
+    }
+
+    if (price) {
+      const section =
+        document.querySelector(
+          '.custom-product-grid-section'
+        );
+
+      const currency =
+        section?.dataset.currency || 'EUR';
+
+      price.textContent =
+        formatMoney(
+          product.price,
+          currency
+        );
+    }
+
+    if (description) {
+      description.innerHTML =
+        product.description || '';
+    }
+
+    if (image) {
+      const trigger =
+        document.querySelector(
+          `[data-product-id="${product.id}"]`
+        );
+
+      const productImage =
+        trigger?.querySelector(
+          '.custom-product-grid__image'
+        );
+
+      if (productImage) {
+        image.src = productImage.src;
+        image.alt = product.title;
+      }
+    }
+
+    if (error) {
+      error.hidden = true;
+      error.textContent = '';
+    }
+
+    renderOptions();
+    updateSelectedVariant();
+
+    modal.classList.add('is-open');
+    modal.setAttribute(
+      'aria-hidden',
+      'false'
+    );
+
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    const modal =
+      document.querySelector('[data-product-modal]');
 
     if (!modal) {
       return;
     }
 
-    const modalImage = modal.querySelector('[data-modal-image]');
-    const modalTitle = modal.querySelector('[data-modal-title]');
-    const modalPrice = modal.querySelector('[data-modal-price]');
-    const modalDescription = modal.querySelector('[data-modal-description]');
-    const modalOptions = modal.querySelector('[data-modal-options]');
-    const modalError = modal.querySelector('[data-modal-error]');
-    const addToCartButton = modal.querySelector('[data-add-to-cart]');
+    modal.classList.remove('is-open');
 
-    let currentProduct = null;
-    let selectedOptions = [];
-    let selectedVariant = null;
+    modal.setAttribute(
+      'aria-hidden',
+      'true'
+    );
 
-    function getVariant() {
-      if (!currentProduct?.variants) {
-        return null;
+    document.body.style.overflow = '';
+  }
+
+  async function getSoftWinterJacketVariant() {
+    try {
+      const response =
+        await fetch(
+          `${window.Shopify.routes.root}products/dark-winter-jacket.js`
+        );
+
+      if (!response.ok) {
+        throw new Error(
+          'Unable to load Soft Winter Jacket'
+        );
       }
 
-      return currentProduct.variants.find((variant) => {
-        return variant.options.every((option, index) => {
-          return option === selectedOptions[index];
-        });
-      }) || null;
-    }
-
-    function updateVariant() {
-      selectedVariant = getVariant();
-
-      if (!selectedVariant) {
-        addToCartButton.disabled = true;
-        return;
-      }
-
-      addToCartButton.disabled = !selectedVariant.available;
-
-      addToCartButton.querySelector('span').textContent =
-        selectedVariant.available ? 'ADD TO CART' : 'SOLD OUT';
-    }
-
-    function renderOptions() {
-      modalOptions.innerHTML = '';
-
-      if (!currentProduct.options?.length) {
-        return;
-      }
-
-      currentProduct.options.forEach((optionName, optionIndex) => {
-        const values = [
-          ...new Set(
-            currentProduct.variants
-              .map((variant) => variant.options[optionIndex])
-              .filter(Boolean)
-          )
-        ];
-
-        if (!values.length) {
-          return;
-        }
-
-        const wrapper = document.createElement('div');
-        wrapper.className = 'gift-product-modal__option';
-
-        const label = document.createElement('span');
-        label.className = 'gift-product-modal__option-label';
-        label.textContent = optionName;
-
-        wrapper.appendChild(label);
-
-        if (optionIndex === 0) {
-          const valuesWrapper = document.createElement('div');
-          valuesWrapper.className =
-            'gift-product-modal__option-values';
-
-          values.forEach((value) => {
-            const button = document.createElement('button');
-
-            button.type = 'button';
-            button.className =
-              'gift-product-modal__option-value';
-            button.textContent = value;
-
-            button.addEventListener('click', () => {
-              selectedOptions[optionIndex] = value;
-
-              valuesWrapper
-                .querySelectorAll(
-                  '.gift-product-modal__option-value'
-                )
-                .forEach((item) => {
-                  item.classList.toggle(
-                    'is-selected',
-                    item === button
-                  );
-                });
-
-              updateVariant();
-            });
-
-            valuesWrapper.appendChild(button);
-          });
-
-          wrapper.appendChild(valuesWrapper);
-        } else {
-          const select = document.createElement('select');
-
-          select.className =
-            'gift-product-modal__option-select';
-
-          const placeholder = document.createElement('option');
-
-          placeholder.value = '';
-          placeholder.textContent =
-            `Choose ${optionName.toLowerCase()}`;
-
-          select.appendChild(placeholder);
-
-          values.forEach((value) => {
-            const option = document.createElement('option');
-
-            option.value = value;
-            option.textContent = value;
-
-            select.appendChild(option);
-          });
-
-          select.addEventListener('change', () => {
-            selectedOptions[optionIndex] = select.value;
-            updateVariant();
-          });
-
-          wrapper.appendChild(select);
-        }
-
-        modalOptions.appendChild(wrapper);
-      });
-    }
-
-    function openModal(trigger) {
-      currentProduct = getProductData(trigger);
-
-      if (!currentProduct) {
-        return;
-      }
-
-      selectedOptions = [];
-      selectedVariant = null;
-
-      modalError.hidden = true;
-      modalError.textContent = '';
-
-      modalTitle.textContent = currentProduct.title;
-
-      modalPrice.textContent = formatMoney(
-        currentProduct.price,
-        currentProduct.currency
-      );
-
-      modalDescription.innerHTML =
-        currentProduct.description || '';
-
-      if (currentProduct.featured_image) {
-        modalImage.src = currentProduct.featured_image.src;
-        modalImage.alt = currentProduct.title;
-      }
-
-      renderOptions();
+      const product =
+        await response.json();
 
       /*
-       * Automatically select options that have only one value.
+       * Find the Black + Medium variant.
+       *
+       * The CSV uses:
+       * Size = M
+       * Color = Black
+       *
+       * We therefore accept both "M" and "Medium".
        */
-      currentProduct.options?.forEach((optionName, index) => {
-        const values = [
-          ...new Set(
-            currentProduct.variants
-              .map((variant) => variant.options[index])
-              .filter(Boolean)
-          )
-        ];
-
-        if (values.length === 1) {
-          selectedOptions[index] = values[0];
-
-          const optionWrappers =
-            modalOptions.querySelectorAll(
-              '.gift-product-modal__option'
+      const variant =
+        product.variants.find((item) => {
+          const options =
+            item.options.map(
+              (value) =>
+                String(value).toLowerCase()
             );
 
-          const wrapper = optionWrappers[index];
+          const hasBlack =
+            options.includes('black');
 
-          if (!wrapper) {
-            return;
-          }
+          const hasMedium =
+            options.includes('m') ||
+            options.includes('medium');
 
-          const button = wrapper.querySelector(
-            '.gift-product-modal__option-value'
-          );
+          return hasBlack && hasMedium;
+        });
 
-          const select = wrapper.querySelector(
-            '.gift-product-modal__option-select'
-          );
+      return variant || null;
+    } catch (error) {
+      console.error(
+        'Soft Winter Jacket error:',
+        error
+      );
 
-          if (button) {
-            button.classList.add('is-selected');
-          }
+      return null;
+    }
+  }
 
-          if (select) {
-            select.value = values[0];
-          }
+  function requiresSoftWinterJacket() {
+    if (!selectedVariant) {
+      return false;
+    }
+
+    const options =
+      selectedVariant.options.map(
+        (value) =>
+          String(value).toLowerCase()
+      );
+
+    const hasBlack =
+      options.includes('black');
+
+    const hasMedium =
+      options.includes('m') ||
+      options.includes('medium');
+
+    return hasBlack && hasMedium;
+  }
+
+  async function addToCart() {
+    const addButton =
+      document.querySelector('[data-add-to-cart]');
+
+    const errorElement =
+      document.querySelector('[data-modal-error]');
+
+    if (!selectedVariant) {
+      if (errorElement) {
+        errorElement.textContent =
+          'Please select an available variant.';
+
+        errorElement.hidden = false;
+      }
+
+      return;
+    }
+
+    addButton.disabled = true;
+
+    if (errorElement) {
+      errorElement.hidden = true;
+      errorElement.textContent = '';
+    }
+
+    try {
+      const items = [
+        {
+          id: selectedVariant.id,
+          quantity: 1
         }
-      });
+      ];
 
-      updateVariant();
+      /*
+       * Special assessment requirement:
+       *
+       * If the selected variant has
+       * Black + Medium options,
+       * automatically add Soft Winter Jacket.
+       */
+      if (
+        requiresSoftWinterJacket() &&
+        currentProduct.handle !==
+          'dark-winter-jacket'
+      ) {
+        const jacketVariant =
+          await getSoftWinterJacketVariant();
 
-      modal.classList.add('is-open');
-      modal.setAttribute('aria-hidden', 'false');
+        if (jacketVariant) {
+          items.push({
+            id: jacketVariant.id,
+            quantity: 1
+          });
+        }
+      }
 
-      document.body.classList.add(
-        'gift-product-modal-open'
+      const response =
+        await fetch(
+          `${window.Shopify.routes.root}cart/add.js`,
+          {
+            method: 'POST',
+
+            headers: {
+              'Content-Type':
+                'application/json',
+              Accept:
+                'application/json'
+            },
+
+            body: JSON.stringify({
+              items
+            })
+          }
+        );
+
+      const data =
+        await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.description ||
+            'Unable to add product to cart.'
+        );
+      }
+
+      /*
+       * Successfully added.
+       */
+      closeModal();
+
+      /*
+       * Refresh the cart drawer/cart count.
+       */
+      document.dispatchEvent(
+        new CustomEvent(
+          'cart:updated',
+          {
+            detail: data
+          }
+        )
       );
-    }
 
-    function closeModal() {
-      modal.classList.remove('is-open');
-      modal.setAttribute('aria-hidden', 'true');
-
-      document.body.classList.remove(
-        'gift-product-modal-open'
+      /*
+       * Give the customer a visible confirmation.
+       */
+      alert('Product added to cart.');
+    } catch (error) {
+      console.error(
+        'Add to cart error:',
+        error
       );
 
-      currentProduct = null;
-      selectedVariant = null;
-    }
+      if (errorElement) {
+        errorElement.textContent =
+          error.message ||
+          'Something went wrong. Please try again.';
 
-    /*
-     * Event delegation.
-     * This also works when Shopify Theme Editor re-renders
-     * the section.
-     */
-    section.addEventListener('click', (event) => {
-      const trigger = event.target.closest(
+        errorElement.hidden = false;
+      }
+    } finally {
+      addButton.disabled = false;
+    }
+  }
+
+  function initProductGrid() {
+    const triggers =
+      document.querySelectorAll(
         '[data-product-trigger]'
       );
 
-      if (trigger) {
-        event.preventDefault();
-        openModal(trigger);
+    /*
+     * Avoid attaching duplicate listeners.
+     */
+    triggers.forEach((trigger) => {
+      if (trigger.dataset.initialized === 'true') {
         return;
       }
 
-      const closeButton = event.target.closest(
-        '[data-modal-close]'
+      trigger.dataset.initialized = 'true';
+
+      trigger.addEventListener(
+        'click',
+        () => {
+          const product =
+            getProductData(trigger);
+
+          if (product) {
+            openModal(product);
+          }
+        }
       );
-
-      if (closeButton) {
-        event.preventDefault();
-        closeModal();
-      }
     });
 
-    document.addEventListener('keydown', (event) => {
-      if (
-        event.key === 'Escape' &&
-        modal.classList.contains('is-open')
-      ) {
-        closeModal();
-      }
-    });
+    const modal =
+      document.querySelector('[data-product-modal]');
 
-    addToCartButton.addEventListener('click', () => {
-      if (!selectedVariant) {
-        modalError.textContent =
-          'Please select all product options.';
-
-        modalError.hidden = false;
-        return;
-      }
-
-      modalError.textContent =
-        `Selected variant: ${selectedVariant.id}`;
-
-      modalError.hidden = false;
-    });
-  }
-
-  function initialize() {
-    document
-      .querySelectorAll('.custom-product-grid-section')
-      .forEach(initProductGrid);
-  }
-
-  /*
-   * Normal storefront.
-   */
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initialize);
-  } else {
-    initialize();
-  }
-
-  /*
-   * Shopify Theme Editor.
-   */
-  document.addEventListener('shopify:section:load', (event) => {
-    const section = event.target;
+    if (!modal) {
+      return;
+    }
 
     if (
-      section.matches &&
-      section.matches('.custom-product-grid-section')
+      modal.dataset.initialized !== 'true'
     ) {
-      initProductGrid(section);
+      modal.dataset.initialized = 'true';
+
+      modal
+        .querySelectorAll('[data-modal-close]')
+        .forEach((element) => {
+          element.addEventListener(
+            'click',
+            closeModal
+          );
+        });
+
+      const addButton =
+        modal.querySelector(
+          '[data-add-to-cart]'
+        );
+
+      if (addButton) {
+        addButton.addEventListener(
+          'click',
+          addToCart
+        );
+      }
     }
-  });
+  }
+
+  /*
+   * Normal page load.
+   */
+  if (
+    document.readyState === 'loading'
+  ) {
+    document.addEventListener(
+      'DOMContentLoaded',
+      initProductGrid
+    );
+  } else {
+    initProductGrid();
+  }
+
+  /*
+   * Shopify Theme Editor dynamically reloads
+   * sections, so initialise again when a
+   * section is loaded.
+   */
+  document.addEventListener(
+    'shopify:section:load',
+    initProductGrid
+  );
+
+  /*
+   * ESC closes the popup.
+   */
+  document.addEventListener(
+    'keydown',
+    (event) => {
+      if (event.key === 'Escape') {
+        closeModal();
+      }
+    }
+  );
 })();
