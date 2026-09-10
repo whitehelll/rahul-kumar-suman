@@ -1,15 +1,14 @@
 <section
-  class="custom-product-grid"
+  class="custom-product-grid-section"
   id="CustomProductGrid-{{ section.id }}"
+  data-currency="{{ shop.currency }}"
 >
-  <div class="custom-product-grid__inner">
-
+  <div class="custom-product-grid">
     <h2 class="custom-product-grid__heading">
       {{ section.settings.heading }}
     </h2>
 
     <div class="custom-product-grid__items">
-
       {% for block in section.blocks %}
         {% assign product = block.settings.product %}
 
@@ -22,22 +21,21 @@
               type="button"
               class="custom-product-grid__product"
               data-product-trigger
+              data-product-handle="{{ product.handle }}"
               data-product-id="{{ product.id }}"
               aria-label="View {{ product.title | escape }}"
             >
-
               <div class="custom-product-grid__image-wrapper">
 
                 {% if product.featured_image %}
-                  {{
-                    product.featured_image
-                    | image_url: width: 1000
-                    | image_tag:
-                      loading: 'lazy',
-                      widths: '400, 600, 800, 1000',
-                      class: 'custom-product-grid__image',
-                      alt: product.featured_image.alt | default: product.title
-                  }}
+                  <img
+                    src="{{ product.featured_image | image_url: width: 1000 }}"
+                    alt="{{ product.featured_image.alt | default: product.title | escape }}"
+                    class="custom-product-grid__image"
+                    loading="lazy"
+                    width="{{ product.featured_image.width }}"
+                    height="{{ product.featured_image.height }}"
+                  >
                 {% endif %}
 
                 <span
@@ -50,32 +48,21 @@
               </div>
             </button>
 
-            {%- comment -%}
-              Product data used by the popup.
-              The product object contains the product's variants,
-              options, title, price and other Shopify product data.
-            {%- endcomment -%}
-
             <script
               type="application/json"
               data-product-data="{{ product.id }}"
             >
               {{ product | json }}
             </script>
-
           </article>
         {% endif %}
       {% endfor %}
-
     </div>
   </div>
 </section>
 
 
-{%- comment -%}
-  Product Popup
-{%- endcomment -%}
-
+<!-- Product Popup -->
 <div
   class="gift-product-modal"
   data-product-modal
@@ -97,7 +84,7 @@
       type="button"
       class="gift-product-modal__close"
       data-modal-close
-      aria-label="Close product details"
+      aria-label="Close"
     >
       ×
     </button>
@@ -116,8 +103,8 @@
       <div class="gift-product-modal__details">
 
         <h2
-          class="gift-product-modal__title"
           id="GiftProductModalTitle-{{ section.id }}"
+          class="gift-product-modal__title"
           data-modal-title
         ></h2>
 
@@ -138,7 +125,7 @@
 
         <button
           type="button"
-          class="gift-product-modal__cart-button"
+          class="gift-product-modal__add"
           data-add-to-cart
         >
           <span>ADD TO CART</span>
@@ -157,25 +144,27 @@
 </div>
 
 
+<script
+  src="{{ 'custom-product-grid.js' | asset_url }}"
+  defer
+></script>
+
+
 {% stylesheet %}
 
-/* =========================================================
-   PRODUCT GRID
-   ========================================================= */
-
-.custom-product-grid {
+.custom-product-grid-section {
   width: 100%;
-  padding: 60px 78px 80px;
   background: #ffffff;
 }
 
-.custom-product-grid__inner {
+.custom-product-grid {
   max-width: 1284px;
   margin: 0 auto;
+  padding: 60px 0 80px;
 }
 
 .custom-product-grid__heading {
-  margin: 0 0 32px;
+  margin: 0 0 28px;
   font-size: 32px;
   line-height: 1.1;
   font-weight: 700;
@@ -193,10 +182,10 @@
 }
 
 .custom-product-grid__product {
-  position: relative;
   display: block;
   width: 100%;
   padding: 0;
+  margin: 0;
   border: 0;
   background: transparent;
   cursor: pointer;
@@ -244,83 +233,64 @@
     background-color 180ms ease;
 }
 
-.custom-product-grid__product:hover .custom-product-grid__hotspot {
+.custom-product-grid__product:hover
+.custom-product-grid__hotspot {
   transform: scale(1.08);
 }
 
 
-/* =========================================================
+/* =========================
    PRODUCT MODAL
-   ========================================================= */
+   ========================= */
 
 .gift-product-modal {
   position: fixed;
   inset: 0;
   z-index: 9999;
 
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
 
-  padding: 24px;
-
-  visibility: hidden;
-  opacity: 0;
-
-  transition:
-    opacity 180ms ease,
-    visibility 180ms ease;
+  padding: 20px;
 }
 
 .gift-product-modal.is-open {
-  visibility: visible;
-  opacity: 1;
+  display: flex;
 }
 
 .gift-product-modal__overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  cursor: pointer;
+  background: rgba(0, 0, 0, 0.55);
 }
 
 .gift-product-modal__dialog {
   position: relative;
-  z-index: 2;
+  z-index: 1;
 
-  width: min(440px, 100%);
-  max-height: calc(100vh - 48px);
+  width: min(900px, 100%);
+  max-height: 90vh;
 
   overflow-y: auto;
 
   background: #ffffff;
-
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
-
-  transform: translateY(10px);
-  transition: transform 180ms ease;
-}
-
-.gift-product-modal.is-open .gift-product-modal__dialog {
-  transform: translateY(0);
 }
 
 .gift-product-modal__close {
   position: absolute;
   top: 12px;
-  right: 12px;
-  z-index: 3;
+  right: 15px;
 
-  width: 28px;
-  height: 28px;
+  z-index: 2;
 
-  padding: 0;
+  width: 38px;
+  height: 38px;
+
   border: 0;
+  background: #ffffff;
 
-  background: transparent;
-  color: #000000;
-
-  font-size: 24px;
+  font-size: 30px;
   line-height: 1;
 
   cursor: pointer;
@@ -332,7 +302,6 @@
 }
 
 .gift-product-modal__image-wrapper {
-  min-height: 100%;
   background: #f5f5f5;
 }
 
@@ -342,152 +311,123 @@
   width: 100%;
   height: 100%;
 
-  min-height: 280px;
+  min-height: 500px;
 
   object-fit: cover;
 }
 
 .gift-product-modal__details {
-  padding: 32px 24px 24px;
+  padding: 50px 40px;
 }
 
 .gift-product-modal__title {
-  margin: 0 30px 8px 0;
+  margin: 0 0 10px;
 
-  font-size: 18px;
-  line-height: 1.2;
-  font-weight: 500;
+  font-size: 30px;
+  line-height: 1.1;
+
+  color: #000000;
 }
 
 .gift-product-modal__price {
-  margin: 0 0 18px;
+  margin: 0 0 25px;
 
-  font-size: 15px;
-  line-height: 1.3;
+  font-size: 18px;
+  font-weight: 600;
 }
 
 .gift-product-modal__description {
-  margin-bottom: 20px;
+  margin-bottom: 30px;
 
-  font-size: 12px;
-  line-height: 1.45;
-}
-
-.gift-product-modal__description p {
-  margin: 0;
-}
-
-.gift-product-modal__options {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-
-  margin-bottom: 24px;
+  font-size: 14px;
+  line-height: 1.6;
 }
 
 .gift-product-modal__option {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
+  margin-bottom: 22px;
 }
 
 .gift-product-modal__option-label {
-  font-size: 11px;
-  line-height: 1;
+  display: block;
+
+  margin-bottom: 10px;
+
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 
-.gift-product-modal__option-values {
+.gift-product-modal__option-buttons {
   display: flex;
-  width: 100%;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
-.gift-product-modal__option-value {
-  flex: 1;
+.gift-product-modal__option-button {
+  min-width: 70px;
+  padding: 10px 15px;
 
-  min-height: 32px;
-
-  padding: 6px 10px;
-
-  border: 1px solid #bdbdbd;
-
+  border: 1px solid #000000;
   background: #ffffff;
-  color: #000000;
-
-  font-size: 12px;
 
   cursor: pointer;
 }
 
-.gift-product-modal__option-value + .gift-product-modal__option-value {
-  border-left: 0;
+.gift-product-modal__option-button.is-selected {
+  background: #000000;
+  color: #ffffff;
 }
 
-.gift-product-modal__option-value.is-selected {
-  border-color: #000000;
-  box-shadow: inset 0 0 0 1px #000000;
-}
-
-.gift-product-modal__option-select {
+.gift-product-modal__select {
   width: 100%;
-  min-height: 34px;
+  padding: 12px;
 
-  padding: 7px 10px;
-
-  border: 1px solid #bdbdbd;
-
+  border: 1px solid #000000;
   background: #ffffff;
-  color: #000000;
 
-  font-size: 12px;
-
-  cursor: pointer;
+  font-size: 14px;
 }
 
-.gift-product-modal__cart-button {
+.gift-product-modal__add {
   display: flex;
   align-items: center;
   justify-content: space-between;
 
   width: 100%;
-  min-height: 48px;
-
-  padding: 12px 16px;
+  padding: 16px 20px;
 
   border: 0;
-
   background: #000000;
   color: #ffffff;
 
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 700;
 
   cursor: pointer;
 
-  transition:
-    transform 160ms ease,
-    opacity 160ms ease;
+  transition: transform 180ms ease;
 }
 
-.gift-product-modal__cart-button:hover {
-  transform: translateY(-1px);
+.gift-product-modal__add:hover {
+  transform: translateY(-2px);
 }
 
-.gift-product-modal__cart-button:disabled {
-  cursor: not-allowed;
-  opacity: 0.55;
+.gift-product-modal__add:disabled {
+  opacity: 0.6;
+  cursor: wait;
 }
 
 .gift-product-modal__error {
-  margin: 12px 0 0;
+  margin-top: 15px;
 
-  font-size: 12px;
-  color: #b00020;
+  color: #c00000;
+  font-size: 13px;
 }
 
 
-/* =========================================================
+/* =========================
    MOBILE
-   ========================================================= */
+   ========================= */
 
 @media screen and (max-width: 749px) {
 
@@ -516,47 +456,41 @@
   }
 
   .gift-product-modal {
-    padding: 12px;
+    padding: 0;
   }
 
   .gift-product-modal__dialog {
-    width: min(420px, 100%);
-    max-height: calc(100vh - 24px);
+    width: 100%;
+    height: 100%;
+    max-height: 100vh;
   }
 
   .gift-product-modal__content {
     display: block;
   }
 
-  .gift-product-modal__image-wrapper {
-    height: 260px;
-  }
-
   .gift-product-modal__image {
-    min-height: 0;
-    height: 260px;
+    min-height: 300px;
+    max-height: 45vh;
   }
 
   .gift-product-modal__details {
-    padding: 22px 18px 18px;
+    padding: 30px 20px 40px;
+  }
+
+  .gift-product-modal__title {
+    font-size: 24px;
   }
 }
 
 {% endstylesheet %}
 
 
-
-<script
-  src="{{ 'custom-product-grid.js' | asset_url }}"
-  defer
-></script>
-
 {% schema %}
 {
   "name": "Custom Product Grid",
   "tag": "section",
   "class": "custom-product-grid-section",
-
   "settings": [
     {
       "type": "text",
@@ -565,7 +499,6 @@
       "default": "Tisso vison in the wild"
     }
   ],
-
   "blocks": [
     {
       "type": "product",
@@ -579,9 +512,7 @@
       ]
     }
   ],
-
   "max_blocks": 6,
-
   "presets": [
     {
       "name": "Custom Product Grid",
