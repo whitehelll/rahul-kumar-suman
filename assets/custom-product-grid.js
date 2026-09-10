@@ -293,6 +293,7 @@
      * Start with the first available variant.
      */
     const firstVariant =
+      // @ts-ignore
       getFirstAvailableVariant(product);
 
     if (firstVariant) {
