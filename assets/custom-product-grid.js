@@ -201,6 +201,7 @@
         button.addEventListener(
           'click',
           () => {
+            // @ts-ignore
             selectedOptions[option.name] = value;
 
             renderOptions();
@@ -229,6 +230,7 @@
         optionElement.textContent = value;
 
         if (
+          // @ts-ignore
           selectedOptions[option.name] === value
         ) {
           optionElement.selected = true;
