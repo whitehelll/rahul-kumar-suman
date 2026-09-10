@@ -18,10 +18,13 @@
         "button_link": "/collections/all"
       }
     },
-    
+    "custom_product_grid": {
+      "type": "custom-product-grid",
+      "settings": {}
+    }
   },
   "order": [
     "custom_gift_banner",
-    
+    "custom_product_grid"
   ]
 }
