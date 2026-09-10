@@ -104,6 +104,9 @@
     );
   }
 
+  /**
+     * @param {{ variants: any[]; }} product
+     */
   function getFirstAvailableVariant(product) {
     if (!product || !product.variants) {
       return null;
@@ -127,6 +130,7 @@
     }
 
     if (selectedVariant) {
+      // @ts-ignore
       addButton.disabled = false;
     } else {
       addButton.disabled = true;
