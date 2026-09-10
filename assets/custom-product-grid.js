@@ -79,6 +79,7 @@
      * @param {{ options: any[]; handle: string; } | null} product
      */
   function getVariant(product) {
+    // @ts-ignore
     if (!product || !product.variants) {
       return null;
     }
