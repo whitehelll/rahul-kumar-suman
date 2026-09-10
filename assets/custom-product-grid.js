@@ -369,11 +369,13 @@
       if (productImage) {
         // @ts-ignore
         image.src = productImage.src;
+        // @ts-ignore
         image.alt = product.title;
       }
     }
 
     if (error) {
+      // @ts-ignore
       error.hidden = true;
       error.textContent = '';
     }
