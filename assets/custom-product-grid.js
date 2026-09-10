@@ -11,6 +11,10 @@
      */
   let selectedVariant = null;
 
+  /**
+     * @param {any} cents
+     * @param {any} currency
+     */
   function formatMoney(cents, currency) {
     try {
       return new Intl.NumberFormat(
@@ -25,7 +29,11 @@
     }
   }
 
+  /**
+     * @param {Element} trigger
+     */
   function getProductData(trigger) {
+    // @ts-ignore
     const productId = trigger.dataset.productId;
 
     const productDataElement =
