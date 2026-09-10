@@ -328,6 +328,7 @@
       modal.querySelector('[data-modal-error]');
 
     if (title) {
+      // @ts-ignore
       title.textContent = product.title;
     }
 
