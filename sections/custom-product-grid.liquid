@@ -138,37 +138,10 @@
   </div>
 </div>
 
-<script
-  type="application/json"
-  data-product-data="{{ product.id }}"
->
-{
-  "id": {{ product.id | json }},
-  "handle": {{ product.handle | json }},
-  "title": {{ product.title | json }},
-  "description": {{ product.description | json }},
-  "featured_image": {{ product.featured_image | image_url: width: 1000 | json }},
-  "price": {{ product.price | json }},
-  "options": [
-    {% for option in product.options_with_values %}
-      {
-        "name": {{ option.name | json }},
-        "values": {{ option.values | json }}
-      }{% unless forloop.last %},{% endunless %}
-    {% endfor %}
-  ],
-  "variants": [
-    {% for variant in product.variants %}
-      {
-        "id": {{ variant.id | json }},
-        "available": {{ variant.available | json }},
-        "price": {{ variant.price | json }},
-        "options": {{ variant.options | json }}
-      }{% unless forloop.last %},{% endunless %}
-    {% endfor %}
-  ]
-}
-</script>
+
+
+
+
 
 {% stylesheet %}
   .custom-product-grid-section {
