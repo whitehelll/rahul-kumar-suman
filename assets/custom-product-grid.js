@@ -322,6 +322,7 @@
       const options = getProductOptions(product);
 
       options.forEach((option, index) => {
+        // @ts-ignore
         selectedOptions[option.name] = firstVariant.options[index];
       });
     }
