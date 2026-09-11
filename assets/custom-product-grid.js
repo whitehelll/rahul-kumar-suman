@@ -369,6 +369,7 @@
       const productImage = trigger.dataset.productImage;
 
       if (productImage) {
+        // @ts-ignore
         modalImage.src = productImage;
         modalImage.alt = product.title || trigger.dataset.productTitle || "";
       } else {
