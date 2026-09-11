@@ -339,6 +339,13 @@
 
     const error = modal.querySelector("[data-modal-error]");
 
+    const productImage = trigger?.dataset.productImage;
+
+    if (productImage && image) {
+      image.src = productImage;
+      image.alt = product.title || trigger?.dataset.productTitle || "";
+    }
+
     if (title) {
       // @ts-ignore
       title.textContent = product.title;
