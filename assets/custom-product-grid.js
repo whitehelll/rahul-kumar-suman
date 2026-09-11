@@ -596,7 +596,7 @@
         const product = getProductData(trigger);
 
         if (product) {
-          openModal(product);
+          openModal(product, trigger);
         }
       });
     });
