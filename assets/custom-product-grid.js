@@ -300,7 +300,7 @@
          price(price, currency): unknown;options: any[];handle: string;
 } | null} product
      */
-  function openModal(product) {
+  function openModal(product, trigger) {
     const modal = document.querySelector("[data-product-modal]");
 
     if (!modal || !product) {
