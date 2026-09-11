@@ -600,7 +600,9 @@
     triggers.forEach((trigger) => {
       // @ts-ignore
       if (trigger.dataset.initialized === "true") {
-        re
+        return;
+      }
+
       // @ts-ignore
       trigger.dataset.initialized = "true";
 
@@ -608,9 +610,7 @@
   'click',
   () => {
     const product =
-      getProductData(trigger);turn;
-      }
-
+      getProductData(trigger);
 
     if (product) {
       openModal(product);
