@@ -25,7 +25,6 @@
               data-product-id="{{ product.id }}"
               data-product-image="{{ product.featured_image | image_url: width: 1000 }}"
               data-product-title="{{ product.title | escape }}"
-              data-product-id="{{ product.id }}"
               aria-label="View {{ product.title | escape }}"
             >
               <div class="custom-product-grid__image-wrapper">
@@ -39,6 +38,7 @@
                     height="{{ product.featured_image.height }}"
                   >
                 {% endif %}
+
                 <span
                   class="custom-product-grid__hotspot"
                   aria-hidden="true"
@@ -56,7 +56,7 @@
             </script>
           </article>
         {% endif %}
-      {%- endfor %}
+      {% endfor %}
     </div>
   </div>
 </section>
@@ -449,7 +449,11 @@
   src="{{ 'custom-product-grid.js' | asset_url }}"
   defer
 >
-    {{ product | json }}
+  {
+    {
+      product | json;
+    }
+  }
 </script>
 
 {% schema %}
