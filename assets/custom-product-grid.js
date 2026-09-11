@@ -33,40 +33,37 @@
   /**
    * Get product JSON belonging to a product trigger.
    */
-  function getProductData(trigger) {
-    if (!trigger) {
-      return null;
-    }
+  async function getProductData(trigger) {
+  if (!trigger) {
+    return null;
+  }
 
-    const productId = trigger.dataset.productId;
+  const handle = trigger.dataset.productHandle;
 
-    if (!productId) {
-      console.error("Product ID not found on trigger.");
-      return null;
-    }
+  if (!handle) {
+    console.error("Product handle not found.");
+    return null;
+  }
 
-    const productDataElement = document.querySelector(
-      `[data-product-data="${productId}"]`
+  try {
+    const response = await fetch(
+      `${window.Shopify.routes.root}products/${handle}.js`
     );
 
-    if (!productDataElement) {
-      console.error("Product data not found for:", productId);
-      return null;
+    if (!response.ok) {
+      throw new Error(`Unable to load product: ${handle}`);
     }
 
-    try {
-      const product = JSON.parse(
-        productDataElement.textContent.trim()
-      );
+    const product = await response.json();
 
-      console.log("Loaded product:", product);
+    console.log("Loaded Shopify product:", product);
 
-      return product;
-    } catch (error) {
-      console.error("Invalid product JSON:", error);
-      return null;
-    }
+    return product;
+  } catch (error) {
+    console.error("Product loading error:", error);
+    return null;
   }
+}
 
   /**
    * Convert Shopify product options into a consistent format.
