@@ -371,6 +371,7 @@
       if (productImage) {
         // @ts-ignore
         modalImage.src = productImage;
+        // @ts-ignore
         modalImage.alt = product.title || trigger.dataset.productTitle || "";
       } else {
         modalImage.removeAttribute("src");
