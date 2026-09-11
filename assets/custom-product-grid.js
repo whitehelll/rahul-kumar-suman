@@ -354,8 +354,10 @@
     if (price) {
       const section = document.querySelector(".custom-product-grid-section");
 
+      // @ts-ignore
       const currency = section?.dataset.currency || "EUR";
 
+      // @ts-ignore
       const variant = getFirstAvailableVariant(product);
 
       const priceValue = variant?.price ?? product.price;
