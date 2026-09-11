@@ -30,47 +30,31 @@
    * @param {Element} trigger
    */
 
-
   function getProductData(trigger) {
-  const productId =
-    trigger.dataset.productId;
+    const productId = trigger.dataset.productId;
 
-  const productDataElement =
-    document.querySelector(
-      `[data-product-data="${productId}"]`
+    const productDataElement = document.querySelector(
+      `[data-product-data="${productId}"]`,
     );
 
-  if (!productDataElement) {
-    console.error(
-      'Product data not found for:',
-      productId
-    );
+    if (!productDataElement) {
+      console.error("Product data not found for:", productId);
 
-    return null;
+      return null;
+    }
+
+    try {
+      const product = JSON.parse(productDataElement.textContent);
+
+      console.log("Loaded product:", product);
+
+      return product;
+    } catch (error) {
+      console.error("Invalid product JSON:", error);
+
+      return null;
+    }
   }
-
-  try {
-    const product =
-      JSON.parse(
-        productDataElement.textContent
-      );
-
-    console.log(
-      'Loaded product:',
-      product
-    );
-
-    return product;
-  } catch (error) {
-    console.error(
-      'Invalid product JSON:',
-      error
-    );
-
-    return null;
-  }
-}
-
 
   /**
    * @param {{ options: any[]; }} product
@@ -382,15 +366,14 @@
         `[data-product-id="${product.id}"]`,
       );
 
-      const productImage = trigger?.querySelector(
-        ".custom-product-grid__image",
-      );
+      const productImage = trigger.dataset.productImage;
 
       if (productImage) {
-        // @ts-ignore
-        image.src = productImage.src;
-        // @ts-ignore
-        image.alt = product.title;
+        modalImage.src = productImage;
+        modalImage.alt = product.title || trigger.dataset.productTitle || "";
+      } else {
+        modalImage.removeAttribute("src");
+        modalImage.alt = "";
       }
     }
 
@@ -606,17 +589,13 @@
       // @ts-ignore
       trigger.dataset.initialized = "true";
 
-      trigger.addEventListener(
-  'click',
-  () => {
-    const product =
-      getProductData(trigger);
+      trigger.addEventListener("click", () => {
+        const product = getProductData(trigger);
 
-    if (product) {
-      openModal(product);
-    }
-  }
-);
+        if (product) {
+          openModal(product);
+        }
+      });
     });
 
     const modal = document.querySelector("[data-product-modal]");
