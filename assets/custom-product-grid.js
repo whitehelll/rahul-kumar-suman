@@ -384,7 +384,9 @@
         // @ts-ignore
         modalImage.alt = product.title || trigger.dataset.productTitle || "";
       } else {
+        // @ts-ignore
         modalImage.removeAttribute("src");
+        // @ts-ignore
         modalImage.alt = "";
       }
     }
