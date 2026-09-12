@@ -48,11 +48,40 @@
               </div>
             </button>
 
+            {%- comment -%}
+              Keep the complete product data in the page so the JavaScript can
+              open the popup without making an extra request for every click.
+            {%- endcomment -%}
             <script
               type="application/json"
               data-product-data="{{ product.id }}"
             >
-              {{ product | json }}
+              {
+                "id": {{ product.id | json }},
+                "handle": {{ product.handle | json }},
+                "title": {{ product.title | json }},
+                "description": {{ product.description | json }},
+                "featured_image": {{ product.featured_image | image_url: width: 1000 | json }},
+                "price": {{ product.price | json }},
+                "options": [
+                  {%- for option in product.options_with_values -%}
+                    {
+                      "name": {{ option.name | json }},
+                      "values": {{ option.values | json }}
+                    }{%- unless forloop.last -%},{%- endunless -%}
+                  {%- endfor -%}
+                ],
+                "variants": [
+                  {%- for variant in product.variants -%}
+                    {
+                      "id": {{ variant.id | json }},
+                      "available": {{ variant.available | json }},
+                      "price": {{ variant.price | json }},
+                      "options": {{ variant.options | json }}
+                    }{%- unless forloop.last -%},{%- endunless -%}
+                  {%- endfor -%}
+                ]
+              }
             </script>
           </article>
         {% endif %}
@@ -77,7 +106,14 @@
       {{- section.id -}}
     "
   >
-    <button type="button" class="gift-product-modal__close" data-modal-close aria-label="Close">×</button>
+    <button
+      type="button"
+      class="gift-product-modal__close"
+      data-modal-close
+      aria-label="Close"
+    >
+      ×
+    </button>
 
     <div class="gift-product-modal__content">
       <div class="gift-product-modal__image-wrapper">
@@ -98,21 +134,35 @@
           data-modal-title
         ></h2>
 
-        <p class="gift-product-modal__price" data-modal-price></p>
+        <p
+          class="gift-product-modal__price"
+          data-modal-price
+        ></p>
 
-        <div class="gift-product-modal__description" data-modal-description></div>
+        <div
+          class="gift-product-modal__description"
+          data-modal-description
+        ></div>
 
-        <div class="gift-product-modal__options" data-modal-options></div>
+        <div
+          class="gift-product-modal__options"
+          data-modal-options
+        ></div>
 
-        <button type="button" class="gift-product-modal__add" data-add-to-cart>
+        <button
+          type="button"
+          class="gift-product-modal__add"
+          data-add-to-cart
+        >
           <span>ADD TO CART</span>
-          <span
-            aria-hidden="true"
-            >→</span
-          >
+          <span aria-hidden="true">→</span>
         </button>
 
-        <p class="gift-product-modal__error" data-modal-error hidden></p>
+        <p
+          class="gift-product-modal__error"
+          data-modal-error
+          hidden
+        ></p>
       </div>
     </div>
   </div>
@@ -203,8 +253,8 @@
   }
 
   /* =========================
-   PRODUCT MODAL
-   ========================= */
+     PRODUCT MODAL
+     ========================= */
 
   .gift-product-modal {
     position: fixed;
@@ -388,8 +438,8 @@
   }
 
   /* =========================
-   MOBILE
-   ========================= */
+     MOBILE
+     ========================= */
 
   @media screen and (max-width: 749px) {
     .custom-product-grid {
@@ -448,13 +498,7 @@
 <script
   src="{{ 'custom-product-grid.js' | asset_url }}"
   defer
->
-  {
-    {
-      product | json;
-    }
-  }
-</script>
+></script>
 
 {% schema %}
 {
